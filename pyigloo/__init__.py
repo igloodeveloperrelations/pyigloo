@@ -156,7 +156,7 @@ class igloo:
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
 
-    def getchildren (self, folderid):
+    def get_children_of_folder (self, folderid):
         """
         APIv1
         Gets the children of the folder.
@@ -189,7 +189,7 @@ class igloo:
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
 
-    def createLabelGroup(self, labelgroupname):
+    def create_label_group(self, labelgroupname):
         """
         Creates new label group
         :return: New label group ID - JSON Format
@@ -200,7 +200,7 @@ class igloo:
         return result.json()['response']
 
 
-    def deleteLabelGroup(self, labelgroup_id, keeplabels=False):
+    def delete_label_group(self, labelgroup_id, keeplabels=False):
         """
         Deletes label group by id
         """
@@ -219,7 +219,7 @@ class igloo:
         return result.json()['response']
 
 
-    def createLabel(self, label, group=None):
+    def create_label(self, label, group=None):
         """
         Creates new label (within a label group or on its own)
         :return: New label ID - JSON Format
@@ -234,7 +234,7 @@ class igloo:
         return result.json()['response']
 
 
-    def deleteLabel(self, label_id):
+    def delete_label(self, label_id):
         """
         Deletes label by id
         """
@@ -244,7 +244,7 @@ class igloo:
         return result.json()['response']
 
 
-    def viewLabelsInGroup(self, labelgroup_id):
+    def view_labels_in_group(self, labelgroup_id):
         """
         Views all labels for given label group ID
         :return: All labels within the label group specified - JSON Format
@@ -255,7 +255,7 @@ class igloo:
         return result.json()['response']
 
 
-    def addLabeltoObject(self, object_id, label_id):
+    def add_label_to_object(self, object_id, label_id):
         """
         Associates the given label with the specified object
         """
@@ -265,7 +265,7 @@ class igloo:
         return result.json()['response']
 
 
-    def removeLabelfromObject(self, object_id, label_id):
+    def remove_label_from_object(self, object_id, label_id):
         """
         Disassociates the given label with the specified object
         """
@@ -275,7 +275,7 @@ class igloo:
         return result.json()['response']
 
 
-    def searchContentByLabel(self, query):
+    def search_content_by_label(self, query):
         """
         Searches for content with the given label name
         :return: List of all objects that are associated with the specified label - JSON Format
