@@ -23,6 +23,7 @@ class igloo:
 
     def __init__(self, info, session=None, version=2):
         self.endpoint = info["API_ENDPOINT"]
+        self.communitykey = info["COMMUNITY_KEY"]
         self.igloo = self.requests.session()
         if session == None:
             self.connect(info,version=version)
@@ -152,5 +153,136 @@ class igloo:
         """
         url = '{0}{1}/community/usergroups/{2}/view'.format(self.endpoint, self.IGLOO_API_ROOT_V1, usergroupId)
         headers =  {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()['response']
+
+    def getchildren (self, folderid):
+        """
+        APIv1
+        Gets the children of the folder.
+
+        Given an ID of the folder, returns all of its children
+
+        """
+        url = '{0}{1}/folders/{2}/children/view'.format(self.endpoint, self.IGLOO_API_ROOT_V1, folderid)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()['response']
+
+    def move(self, id, destination, domain=None):
+        """
+        Move an object by id to a destination channel - also by id.
+        Destination channel MUST be of the same type as the object.
+        """
+        url = '{0}{1}/objects/{2}/move?destination={3}&parentId={4}'.format(self.endpoint, self.IGLOO_API_ROOT_V1, id, destination, destination)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+    def search(self, offset, limit, query=""):
+        """
+        Searches for content
+        :return: Search results - JSON Format
+        """
+        url = '{0}{1}/communities/{2}/search/content?query=\"{3}\"&limit={4}&offset={5}&applications=Document'.format(self.endpoint, self.IGLOO_API_ROOT_V2, self.communitykey, query, limit, offset)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()['response']
+
+    def createLabelGroup(self, labelgroupname):
+        """
+        Creates new label group
+        :return: New label group ID - JSON Format
+        """
+        url = '{0}{1}/categories/classes/add?name={2}'.format(self.endpoint, self.IGLOO_API_ROOT_V1, labelgroupname)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+
+    def deleteLabelGroup(self, labelgroup_id, keeplabels=False):
+        """
+        Deletes label group by id
+        """
+        _keep = 'false'
+
+        if keeplabels:
+            _keep = 'true'
+            url = '{0}{1}/categories/classes/{2}/delete?keepCategories={3}'.format(self.endpoint, self.IGLOO_API_ROOT_V1, labelgroup_id,
+                                                                                          _keep)
+        else:
+            url = '{0}{1}/categories/classes/{2}/delete?keepCategories={3}'.format(self.endpoint, self.IGLOO_API_ROOT_V1,
+                                                                                 labelgroup_id,
+                                                                                 _keep)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+
+    def createLabel(self, label, group=None):
+        """
+        Creates new label (within a label group or on its own)
+        :return: New label ID - JSON Format
+        """
+        if group != None:
+            url = "{0}{1}/categories/add?name={2}&categoryClassId={3}".format(self.endpoint, self.IGLOO_API_ROOT_V1, label, group)
+        else:
+            url = "{0}{1}categories/add?name={2}".format(self.endpoint, self.IGLOO_API_ROOT_V1, label)
+
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+
+    def deleteLabel(self, label_id):
+        """
+        Deletes label by id
+        """
+        url = "{0}{1}/categories/{2}/delete".format(self.endpoint, self.IGLOO_API_ROOT_V1, label_id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+
+    def viewLabelsInGroup(self, labelgroup_id):
+        """
+        Views all labels for given label group ID
+        :return: All labels within the label group specified - JSON Format
+        """
+        url = "{0}{1}/categories/classes/{2}/viewCategories".format(self.endpoint, self.IGLOO_API_ROOT_V1, labelgroup_id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()['response']
+
+
+    def addLabeltoObject(self, object_id, label_id):
+        """
+        Associates the given label with the specified object
+        """
+        url = "{0}{1}/objects/{2}/add_categories?categories={3}".format(self.endpoint, self.IGLOO_API_ROOT_V1, object_id, label_id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+
+    def removeLabelfromObject(self, object_id, label_id):
+        """
+        Disassociates the given label with the specified object
+        """
+        url = "{0}{1}/objects/{2}/remove_categories?categories={3}".format(self.endpoint, self.IGLOO_API_ROOT_V1, object_id, label_id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+
+    def searchContentByLabel(self, query):
+        """
+        Searches for content with the given label name
+        :return: List of all objects that are associated with the specified label - JSON Format
+        """
+        url = "{0}{1}/communities/{2}/search/content?query={3}&objectSearchType=Labels".format(self.endpoint, self.IGLOO_API_ROOT_V2,
+                                                                                                      self.communitykey,
+                                                                                                      query)
+        headers = {b'Accept': 'application/json'}
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
