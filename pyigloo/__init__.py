@@ -21,28 +21,41 @@ class igloo:
     igloo = None
     endpoint = None
 
-    def __init__(self, info, session=None):
+    def __init__(self, info, session=None, version=2):
         self.endpoint = info["API_ENDPOINT"]
         self.igloo = self.requests.session()
         if session == None:
-            self.connect(info)
+            self.connect(info,version=version)
         else:
             self.adopt(session)
 
     def __repr__(self):
         return '<{} @ {}>'.format(self.ticket, self.endpoint)
 
-    def connect (self, info):
-        v2 = {
-            "AppId":        info["ACCESS_KEY"],
-            "AppPassword":  info["API_KEY"],
-            "UserName":     info["API_USER"],
-            "UserPassword": info["API_PASSWORD"],
-            "instance":     0, # FIXME: Allow this to be set
-            "version":      1  # FIXME: Allow this to be set
-        }
-        result = self.get_session_v2(v2)
-        cookie = self.requests.cookies.create_cookie ("iglooauth", result.json()['TokenId'])
+    def connect (self, info, version=2):
+
+        if version == 2:
+            params = {
+                "AppId": info["ACCESS_KEY"],
+                "AppPassword": info["API_KEY"],
+                "UserName": info["API_USER"],
+                "UserPassword": info["API_PASSWORD"],
+                "instance": 0,  # FIXME: Allow this to be set
+                "version": 1  # FIXME: Allow this to be set
+            }
+            result = self.get_session_v2(params)
+            cookie = self.requests.cookies.create_cookie("iglooauth", result.json()['TokenId'])
+        else:
+            params = {
+                "appId": info["ACCESS_KEY"],
+                "appPass": info["API_KEY"],
+                "username": info["API_USER"],
+                "password": info["API_PASSWORD"],
+                "apiversion": 1,
+                "community": info["API_ENDPOINT"]
+            }
+            result = self.get_session_v1(params)
+            cookie = self.requests.cookies.create_cookie ("iglooauth", result.json()["response"]['sessionKey'])
         self.igloo.cookies.set_cookie(cookie)
         self.ticket = cookie
 
