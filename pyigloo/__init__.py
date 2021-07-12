@@ -10,6 +10,8 @@ Usage example:
 
 """
 
+
+
 class igloo:
 
     import requests
@@ -156,7 +158,7 @@ class igloo:
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
 
-    def get_children_of_folder (self, folderid):
+    def get_children (self, id):
         """
         APIv1
         Gets the children of the folder.
@@ -164,7 +166,7 @@ class igloo:
         Given an ID of the folder, returns all of its children
 
         """
-        url = '{0}{1}/folders/{2}/children/view'.format(self.endpoint, self.IGLOO_API_ROOT_V1, folderid)
+        url = '{0}{1}/folders/{2}/children/view'.format(self.endpoint, self.IGLOO_API_ROOT_V1, id)
         headers = {b'Accept': 'application/json'}
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
@@ -184,7 +186,7 @@ class igloo:
         Searches for content
         :return: Search results - JSON Format
         """
-        url = '{0}{1}/communities/{2}/search/content?query=\"{3}\"&limit={4}&offset={5}&applications=Document'.format(self.endpoint, self.IGLOO_API_ROOT_V2, self.communitykey, query, limit, offset)
+        url = '{0}{1}/communities/{2}/search/content?query=\"{3}\"&limit={4}&offset={5}'.format(self.endpoint, self.IGLOO_API_ROOT_V2, self.communitykey, query, limit, offset)
         headers = {b'Accept': 'application/json'}
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
@@ -286,3 +288,56 @@ class igloo:
         headers = {b'Accept': 'application/json'}
         result = self.igloo.get(url, headers=headers)
         return result.json()['response']
+
+    def get_site_map(self):
+        """ Get the sitemap """
+
+        url = "{0}{1}/Navigation/GetSiteMap".format(self.endpoint, self.IGLOO_API_ROOT_V2)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()
+
+    def get_labels_for_object(self, id):
+        """
+        :return: List of all labels associated to an object - JSON Format
+        """
+        url = "{0}{1}/objects/{2}/categories".format(self.endpoint, self.IGLOO_API_ROOT_V1, id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()['response']
+
+    def get_retention_policy_for_id(self, id):
+        """
+
+        :param id:
+        :return: The retention policy for an object - JSON format
+
+        #NOTE- RETENTION POLICY IS THROWING A 500 FOR SOME REASON. CHECK WITH ENGINEERING
+
+        """
+        url = "{0}{1}/retention/{2}/view".format(self.endpoint, self.IGLOO_API_ROOT_V1, id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.post(url, headers=headers)
+        return result.json()['response']
+
+    def get_comments_for_object(self, id):
+        """ TODO: THIS IS A PAGINATED CALL"""
+
+        url ="{0}{1}/objects/{2}/comments/view?maxcount=100".format(self.endpoint, self.IGLOO_API_ROOT_V1, id)
+        headers = {b'Accept': 'application/json'}
+        result = self.igloo.get(url, headers=headers)
+        return result.json()['response']
+
+
+    def get_objects_by_path(self, root):
+        """ Recursively walks the site from the 'root' path specified, and gets all of the children, and it's children
+        and so on. The result is a very complete sitemap of the site.
+
+        Warning... this will be a LONG running command.
+
+        """
+
+
+
+
+
